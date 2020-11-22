@@ -6,7 +6,7 @@
 
 ## Snapshot
 
-(/Assets/mock.png)
+![Image](/Assets/mock.png)
 
 ## Code Samples
 
