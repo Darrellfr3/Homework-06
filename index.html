@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="Assets/style.css" />
+    <title>Document</title>
+</head>
+<body>
+    <header>
+        <h1>Weather Dashboard</h1>
+    </header>
+    <aside>
+        <h3>Search for a city:</h3>
+        <input type="text" id="city">
+        <button id="submitBtn">Search</button>
+        <ul id="searchHist"></ul>
+    </aside>
+    <section id="current">
+        <h2 id="currentState">Waiting for user input</h2>
+        <ul>
+            <p>Temperature: <li id="currentTemp"></li></p>
+            <p>Humidity: </p><li id="currentHumid"></li>
+            <p>Wind Speed: </p><li id="currentWind"></li>
+            <p>UV Index: </p><li id="currentUv"></li>
+        </ul>
+    </section>
+    <section id="fiveDay">
+        <h3>5-Day Forecast:</h3>
+        <ul id="fiveDayList" class="row">
+            <div class="column">
+                <li class= "card">
+                    <h3 id="dayDate1"></h3>
+                    <p>Temp: <p class="dayTemp"></p></p>
+                    <p>Humidity: <p class="dayHumid"></p></p>
+                </li>
+            </div>
+            <div class="column">
+                <li class="card">
+                    <h3 id="dayDate2"></h3>
+                    <p>Temp: <p class="dayTemp"></p></p>
+                    <p>Humidity: <p class="dayHumid"></p></p>
+                </li>
+            </div>
+            <div class="column">
+                <li class="card">
+                    <h3 id="dayDate3"></h3>
+                    <p>Temp: <p class="dayTemp"></p></p>
+                    <p>Humidity: <p class="dayHumid"></p></p>
+                </li>
+            </div>
+            <div class="column">
+                <li class="card">
+                    <h3 id="dayDate4"></h3>
+                    <p>Temp: <p class="dayTemp"></p></p>
+                    <p>Humidity: <p class="dayHumid"></p></p>
+                </li>
+            </div>
+            <div class="column">
+                <li class="card">
+                    <h3 id="dayDate4"></h3>
+                    <p>Temp: <p class="dayTemp"></p></p>
+                    <p>Humidity: <p class="dayHumid"></p></p>
+                </li>
+            </div>
+        </ul>
+    </section>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script type="text/javascript">
+        var submitBtn=$("#submitBtn");
+
+        function currentWeather(){
+            var cityEl=$("#city").val().trim();
+            var queryURL="https://api.openweathermap.org/data/2.5/weather?q="+cityEl+"&units=imperial&appid=a2e4f9a95bb5b2a32ad28b367f752e70";
+
+            $.ajax({url:queryURL,method:"GET"}).then(function(response){
+                var lonEl=response.coord.lon;
+                var latEl=response.coord.lat;
+
+                $("#currentTemp").text((response.main.temp).toFixed(1)+"°F");
+                $("#currentHumid").text(response.main.humidity+"%");
+                $("#currentWind").text((response.wind.speed).toFixed(1)+" MPH");
+                sessionStorage.setItem("history", response);
+
+                var queryURL="http://api.openweathermap.org/data/2.5/uvi?lat="+latEl+"&lon="+lonEl+"&appid=a2e4f9a95bb5b2a32ad28b367f752e70";
+                $.ajax({url:queryURL,method:"GET"}).then(function(response){
+                    $("#currentUv").text(response.value);
+
+                    sessionStorage.setItem("historyUV", response);
+                    var historyBtn;
+                    historyBtn.text(cityEl);
+                    historyBtn=$('<button>');
+                    historyBtn.addClass("card");
+                    $("#searchHist").append(historyBtn);
+                })
+            })
+        }
+        function weekWeather(){
+            var cityEl=$("#city").val().trim();
+            var weekHumid=$(".dayHumid").text();
+            var queryURL="https://api.openweathermap.org/data/2.5/forecast?q="+cityEl+"&units=imperial&appid=a2e4f9a95bb5b2a32ad28b367f752e70";
+
+            $.ajax({url:queryURL,method:"GET"}).then(function(response){
+                console.log(response);
+                for(var i=0;i<5;i++){
+                    weekHumid[i]=JSON.stringify(response.list.main.temp);
+                }
+            })
+        }
+
+        submitBtn.on("click",currentWeather);
+        submitBtn.on("click",weekWeather);
+        historyBtn.on("click",function(){
+            console.log(sessionStorage.history);
+            // $("#currentTemp").text((response.main.temp).toFixed(1)+"°F");
+            // $("#currentHumid").text(response.main.humidity+"%");
+            // $("#currentWind").text((response.wind.speed).toFixed(1)+" MPH");
+            // $("#currentUv").text(response.value);
+        })
+    </script>
+</body>
+</html>
